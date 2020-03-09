@@ -36,26 +36,37 @@ val dokkaJar by tasks.creating(Jar::class) {
     classifier = "javadoc"
     from(tasks.dokka)
 }
-//tas
-//task sourceJar(type: Jar) {
-//    from sourceSets.main.allJava
-//            classifier "sources"
+
+//publishing {
+//    publications {
+//        create<MavenPublication>("default") {
+//            from(components["java"])
+//            artifact(dokkaJar)
+////            artifact(sourceJar)
+//        }
+//    }
+//    repositories {
+//        maven {
+//            url = uri("$buildDir/repository")
+//        }
+//    }
 //}
 
-//val sourceJar by tasks.creating(Jar::class){
-//    from(sourceSets.main.)
-//}
 publishing {
     publications {
-        create<MavenPublication>("default") {
+        register("gpr", MavenPublication::class) {
             from(components["java"])
-            artifact(dokkaJar)
-//            artifact(sourceJar)
         }
     }
+
     repositories {
         maven {
-            url = uri("$buildDir/repository")
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/pallavirawat/kotlin-sample-library")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            }
         }
     }
 }
